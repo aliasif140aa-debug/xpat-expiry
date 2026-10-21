@@ -1582,6 +1582,38 @@ tbody tr[class*="row-"]:hover td{filter:brightness(.965);}
   #view-dash .countrybar{gap:6px;} #view-dash .crow{font-size:.78rem;}
   #view-dash .gender-card .fig-wrap{width:36px;height:56px;}
 }
+
+/* ===== Phone: smaller header, greeting and white buttons (sizes only) ===== */
+@media (max-width:640px){
+  .hdr{gap:10px !important;margin-bottom:10px !important;padding-top:10px !important;}
+  .logo-img{height:30px !important;} .co-img{height:26px !important;}
+  .hdr-actions .upm-btn{height:38px !important;font-size:.8rem !important;}
+  .hdr-actions > button,.hdr-tools > button{width:38px !important;height:38px !important;}
+  .hdr-actions > button svg,.hdr-tools > button svg,.hdr-actions .upm-btn svg{width:16px;height:16px;}
+  .hdr-foot{margin-top:-2px !important;}
+  .greet{margin:-6px 0 12px !important;gap:2px 8px !important;}
+  .g-hi{font-size:.95rem !important;} .g-sub{font-size:.78rem !important;} .g-date{font-size:.72rem !important;}
+  /* white (ghost) buttons, dropdowns and search boxes in every tab */
+  .view .row select:not(.inline-edit),.view .row input[type=text]:not(.inline-edit),.view .row input[type=date]:not(.inline-edit),.view .row button,.view .row .mp-trigger{height:36px !important;min-height:0 !important;}
+  .view .row button,.view .row .mp-trigger{font-size:.78rem !important;padding:0 10px !important;border-radius:9px !important;}
+  .view .row select:not(.inline-edit){font-size:16px;padding-top:0;padding-bottom:0;border-radius:9px;}
+  .view .row input[type=text]:not(.inline-edit){border-radius:9px;}
+  .view .row,.view .row.between{gap:6px !important;}
+  .m-sort select{height:36px !important;} .m-sort button{height:36px !important;width:40px !important;}
+  .m-sort label{font-size:.7rem;}
+  .panel-actions > button{height:32px !important;font-size:.76rem !important;padding:0 11px !important;}
+  .threshold-toggle .thresh-btn{height:30px;padding-top:0;padding-bottom:0;}
+  .m-chip{height:30px !important;font-size:.72rem !important;padding:0 10px !important;}
+  .nwp-chips > button.nwp-chip{padding:6px 9px !important;font-size:.72rem !important;}
+}
+
+/* ===== Phone: overall text scale matched to the HR Letters app (14px base) ===== */
+@media (max-width:640px){
+  html{font-size:14.5px;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{font-size:14px !important;line-height:1.5;padding-left:10px !important;padding-right:10px !important;}
+  .panel-actions{margin:0 -10px !important;width:calc(100% + 20px) !important;padding-left:10px !important;padding-right:10px !important;}
+  #view-dash .cost-months{margin:0 -14px !important;}
+}
 </style>
 </head>
 <body>
@@ -5565,6 +5597,8 @@ function showBootSplash(label){
 function hideBootSplash(){ const sp = document.getElementById('bootSplash'); if(!sp || sp.classList.contains('gone')) return; sp.classList.add('gone'); setTimeout(() => sp.remove(), 600); }
 setTimeout(hideBootSplash, 4000);   /* never block the page for long */
 function playDashIntro(force){
+  /* on opening the app, keep the loading screen up for a moment (like Refresh) before the dashboard plays in */
+  if(force){ const wait = 1300 - (window.performance ? performance.now() : 2000); if(wait > 0){ clearTimeout(playDashIntro._w); playDashIntro._w = setTimeout(() => playDashIntro(true), wait); return; } }
   if(force) hideBootSplash();
   if(REDUCED_MOTION) return;
   const v = document.getElementById('view-dash'); if(!v || !v.classList.contains('active')) return;
