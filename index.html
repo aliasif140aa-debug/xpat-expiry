@@ -3763,6 +3763,21 @@ img.flg{display:inline-block;height:.95em;width:auto;vertical-align:-.12em;borde
   .rec-modal .rec-scroll{overflow:visible !important;flex:none !important;}
   .rec-modal .rec-ft{position:static !important;padding-bottom:16px !important;}
 }
+
+/* phone: no iPhone zoom on typing boxes; popup header with arrows + floating close */
+@media (max-width:640px){
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),select,textarea{font-size:16px !important;}
+  .rec-modal .rec-rh{position:sticky;top:0;z-index:4;background:var(--card);margin:-16px -16px 4px !important;padding:12px 16px 10px;border-bottom:1px solid transparent;gap:6px !important;}
+  .rec-modal .rec-rh h3{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rec-modal .rec-rh .rec-pos{margin-left:auto;white-space:nowrap;}
+  .rec-modal > .rec-r{overflow:visible !important;}
+  .rec-modal .rec-rh.m-stuck{box-shadow:0 6px 12px -8px rgba(0,20,30,.35);}
+  .rec-modal .rec-rh .rec-nav{position:static !important;transform:none !important;width:32px !important;height:32px !important;border-radius:10px !important;font-size:1.15rem !important;box-shadow:none !important;border:1px solid var(--border) !important;background:var(--card) !important;color:var(--accent) !important;flex:none;display:inline-flex !important;align-items:center;}
+  .rec-modal .rec-rh .rec-nav + .rec-x,.rec-modal .rec-rh .rec-nav.r + .rec-x{margin-left:2px !important;}
+  .rec-modal .rec-rh .rec-pos + .rec-nav{margin-left:4px;}
+  .rec-modal .m-fx{position:absolute;top:12px;right:12px;z-index:5;width:36px;height:36px;padding:0 !important;display:grid !important;place-items:center;border-radius:12px !important;background:rgba(255,255,255,.18) !important;border:1px solid rgba(255,255,255,.4) !important;color:#fff !important;font-weight:800;font-size:.95rem;margin:0 !important;}
+  .rec-modal .rec-l{position:relative;}
+}
 </style>
 </head>
 <body>
@@ -12991,6 +13006,32 @@ initDb();
     bizChips();
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
+<script>
+/* Phone popups: move ‹ › into header, add floating close (layout only) */
+(function(){
+  var mq=window.matchMedia('(max-width:640px)');
+  function fix(dr){
+    if(!mq.matches) return;
+    var rh=dr.querySelector('.rec-rh'), x=rh&&rh.querySelector('.rec-x');
+    if(rh&&x){ dr.querySelectorAll(':scope > .rec-nav').forEach(function(n){ rh.insertBefore(n,x); }); }
+    var l=dr.querySelector(':scope > .rec-l');
+    if(l&&!l.querySelector('.m-fx')){
+      var b=document.createElement('button'); b.type='button';
+      b.className='rec-x m-fx'+(dr.id==='profileDrawer'?' dr-close':''); b.setAttribute('aria-label','Close'); b.textContent='\u2715';
+      l.appendChild(b);
+    }
+  }
+  var seen=new WeakSet();
+  function watch(){
+    ['recDrawer','profileDrawer'].forEach(function(id){
+      var dr=document.getElementById(id); if(!dr||seen.has(dr)) return; seen.add(dr);
+      new MutationObserver(function(){ fix(dr); }).observe(dr,{childList:true,subtree:true});
+      fix(dr);
+    });
+  }
+  new MutationObserver(watch).observe(document.body,{childList:true}); watch();
 })();
 </script>
 </body>
