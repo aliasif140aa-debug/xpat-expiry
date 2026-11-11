@@ -15203,22 +15203,32 @@ initDb();
 })();
 </script>
 <script>
-/* Phone: after opening a card, gently scroll so the whole card is on screen */
-window.__mFit = function(node){
-  if(!node || !window.matchMedia('(max-width:640px)').matches) return;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  clearTimeout(window.__mFitT1); clearTimeout(window.__mFitT2);
-  var go = function(){
-    var n = typeof node === 'function' ? node() : node; if(!n || !n.isConnected) return;
-    var r = n.getBoundingClientRect(), bar = document.querySelector('.tabs'), br = bar && bar.getBoundingClientRect();
-    var top = 12, bottom = (br && br.top > 0 && br.top < window.innerHeight ? br.top : window.innerHeight) - 12;
-    var dy = 0;
-    if(r.bottom > bottom) dy = Math.min(r.bottom - bottom, r.top - top);
-    else if(r.top < top) dy = r.top - top;
-    if(Math.abs(dy) > 2) window.scrollBy({ top: dy, behavior: reduce ? 'auto' : 'smooth' });
+/* Phone: after opening a card, glide once so the whole card is on screen */
+(function(){
+  var anim=null;
+  function stop(){ if(anim){ cancelAnimationFrame(anim); anim=null; } }
+  ['touchstart','wheel','keydown'].forEach(function(ev){ window.addEventListener(ev, stop, { passive:true }); });
+  function glide(dy){
+    stop();
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ window.scrollBy(0, dy); return; }
+    var y0=window.scrollY, t0=null, dur=Math.min(520, Math.max(300, Math.abs(dy)*0.9));
+    var step=function(t){ if(t0===null) t0=t; var k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);
+      window.scrollTo(0, y0 + dy*e); if(k<1) anim=requestAnimationFrame(step); else anim=null; };
+    anim=requestAnimationFrame(step);
+  }
+  window.__mFit = function(node){
+    if(!node || !window.matchMedia('(max-width:640px)').matches) return;
+    clearTimeout(window.__mFitT);
+    window.__mFitT = setTimeout(function(){ requestAnimationFrame(function(){
+      var n = typeof node === 'function' ? node() : node; if(!n || !n.isConnected) return;
+      var r = n.getBoundingClientRect(), bar = document.querySelector('.tabs'), br = bar && bar.getBoundingClientRect();
+      var top = 12, bottom = (br && br.top > 0 && br.top < window.innerHeight ? br.top : window.innerHeight) - 12, dy = 0;
+      if(r.bottom > bottom) dy = Math.min(r.bottom - bottom, r.top - top);
+      else if(r.top < top) dy = r.top - top;
+      if(Math.abs(dy) > 2) glide(dy);
+    }); }, 30);
   };
-  window.__mFitT1 = setTimeout(go, 120); window.__mFitT2 = setTimeout(go, 520);
-};
+})();
 </script>
 <script>
 /* Phone bottom bar: refreshed icon set (layout only) */
